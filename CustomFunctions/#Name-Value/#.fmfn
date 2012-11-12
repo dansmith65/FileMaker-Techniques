@@ -42,13 +42,37 @@
  * =====================================
  */
 
-"$"
-& Substitute (
-	name;
-	[ "$" ; "" ];
-	[ "=" ; "" ];
-	[ " " ; "" ]
+Let ( [
+	~name = // remove leading dollar sign's, which are valid Let() variables, but do not work with the format of this function
+		Case (
+			Left ( name ; 2 ) = "$$" ;
+			Right ( name ; Length ( name ) - 2 ) ;
+			
+			Left ( name ; 1 ) = "$" ;
+			Right ( name ; Length ( name ) - 1 ) ;
+			
+			name
+		) ;
+	~value = 
+		If (
+			GetAsNumber ( value ) = value ;
+			GetAsNumber ( value ) ;
+			Quote ( value )
+		) ;
+	~parameters = "$" & ~name & " = " & ~value & ";¶" ;
+	~evaluateString = 
+			"Let( ["
+			& ~parameters
+			& "void = \"\""  //terminating variable to keep semicolon-delimited sytax in variableString consistent
+			& "¶];¶"
+			& "$" & ~name
+			& "¶)"
+] ;
+	Case (
+		IsValidExpression ( ~evaluateString ) ;
+			~parameters ;
+
+		//else, ~evaluateString is not a valid expression...
+			"//ERROR name=" & Quote ( name ) & " value=" & Quote ( value )
+	)
 )
-& " = "
-& Quote ( value )
-& ";¶"
