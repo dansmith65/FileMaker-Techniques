@@ -70,8 +70,9 @@ Let ( [
 			not isempty ( Filter ( value ; ~timeChars ) ) ;
 			"GetAsTime ( " & GetAsNumber( value ) & ")" ;
 
-		// this section should never be reached, it's just a fail-safe
-			Quote ( value )
+		// if the ~dateChars and ~timeChars variables do not contain the separator chars in use
+		// on the current computer, store the date/time/timestamp as a number
+			GetAsNumber ( value )
 		)
 	) ;
 	~parameters = "$" & ~name & " = " & ~value & ";¶" ;
